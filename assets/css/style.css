@@ -39,10 +39,12 @@ h4 { /* the 5 populated dates under 5 day forecast*/
 }
 
 /* Classes styling */
-.mainRow {
+.mainRow { /* Overall container for everything within the main tags */
     display: flex;
-    margin-left: 10px;
+    margin-left: 5px;
 }
+
+/* left hand column */
 .searchBox {
     padding: 5px;
     width: 25%;
@@ -55,21 +57,39 @@ h4 { /* the 5 populated dates under 5 day forecast*/
 #clearBtn {
     background-color: var(--darkblue);
     color: white;
-    margin-top: 15px;
-}
-#currentWeatherBox {
-    border: solid black 1px;
-    padding: 5px;
-    padding-left: 10px;
-}
-#weatherDisplay {
-    width: 75%;
-    padding: 10px;
+    margin: 15px 0;
+
 }
 #previousSearch {
     border-top: solid black 2px;
 }
 
+.btn { /* All clickable buttons defaults*/
+    background-color: var(--gray);
+    width: 100%;
+    margin: 5px 0;
+}
+
+/* right hand column */
+#currentWeatherBox {
+    border: solid black 1px;
+    padding: 5px;
+    padding-left: 10px;
+}
+#error{
+    padding: 20px;
+    margin-left: 20px;
+}
+#weatherDisplay {
+    width: 75%;
+    padding: 10px;
+}
+.uvIndex {
+    background: green;
+    color: white;
+    border-radius: 5px;
+    padding: 5px 15px;
+}
 #fiveDays {
     display: flex;
     justify-content: space-between;
@@ -80,23 +100,6 @@ h4 { /* the 5 populated dates under 5 day forecast*/
     width: calc(20% - 10px);
     padding: 5px;
 }
-.btn { /* previous searches button*/
-    background-color: var(--gray);
-    width: 100%;
-    margin: 5px 0;
-    font-size: initial;
-}
-
-.uvColor {
-    background: green;
-    color: white;
-    border-radius: 5px;
-    padding: 5px 15px;
-}
-
-
-
-/* ---------- */
 .icon {
     width: 50px;
 }

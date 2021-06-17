@@ -18,7 +18,10 @@ var previousSearches = JSON.parse(localStorage.getItem("previousSearches")) || [
 function errorDisplay() {
     weatherDisplayEL.empty();
     weatherDisplayEL.append(`
-        <h2>No Results Found. Please Try Again</h2>
+        <div id="error">
+        <h2>No Results Found.</h2>
+        <h2>Please Enter a Valid City.</h2>
+        </div>
     `);
 }
 
@@ -30,10 +33,10 @@ function weatherDisplayed(weatherData) {
             <h2>${citySearched} (${moment(weatherData.current.dt, "X").format("MM/DD/YYYY")})
                 <img src="https://openweathermap.org/img/wn/${weatherData.current.weather[0].icon}@2x.png" alt="weather icon" class="icon"> 
             </h2>
-            <p>Temp: ${weatherData.current.temp} <span>&#176;</span> F</p>
+            <p>Temp: ${weatherData.current.temp} <span>&#176;</span>F</p>
             <p>Wind: ${weatherData.current.wind_speed} MPH</p>
             <p>Humidity: ${weatherData.current.humidity} %</p>
-            <p>UV Index: <span class="uvColor ${(weatherData.current.uvi)}">${weatherData.current.uvi}</span></p>
+            <p>UV Index: <span class="uvIndex ${(weatherData.current.uvi)}">${weatherData.current.uvi}</span></p>
         </div>
         <h3>5-Day Forecast:</h3>
         <div id="fiveDays">
@@ -53,7 +56,7 @@ function forecastDisplayed(forecastData) {
             <div class="forecastBox ${(forecastData.daily[i].temp.day)}">
                 <h4>${moment(forecastData.daily[i].dt, "X").format("MM/DD/YYYY")}</h4>
                 <img src="https://openweathermap.org/img/wn/${forecastData.daily[i].weather[0].icon}@2x.png" alt="weather icon" class="icon"> 
-                <p>Temp: ${forecastData.daily[i].temp.day} <span>&#176;</span> F</p>
+                <p>Temp: ${forecastData.daily[i].temp.day} <span>&#176;</span>F</p>
                 <p>Wind: ${forecastData.daily[i].wind_speed} MPH</p>
                 <p>Humidity: ${forecastData.daily[i].humidity} %</p>    
             </div>
@@ -63,7 +66,7 @@ function forecastDisplayed(forecastData) {
 }
 
 // Here we are calling the api's longitude and latitude for the wind, UV, etc.
-function searchApiByCoordinates(lat, lon) {
+function searchApiByCoordinates(lat,lon) {
     var locQueryUrl = `${APIurl}onecall?${lat}&${lon}&exclude=minutely,hourly&units=imperial&appid=${APIkey}`;
 
     fetch(locQueryUrl)
@@ -84,7 +87,7 @@ function searchApiByCoordinates(lat, lon) {
         });
 }
 
-// similar to the function above, but this is purely for the city
+// Similar to the function above, but this is purely for the city
 function searchApiByCity() {
     var locQueryUrl = `${APIurl}weather?q=${citySearched}&appid=${APIkey}`;
 
@@ -116,7 +119,7 @@ function saveSearches() {
 function clearSearchbox() {
     searchEL.empty();
     searchEL.append(`
-        <input type="search" placeholder="Ex: Bellevue" class="form-control" id="searchInput">
+        <input type="search" placeholder="Bellevue" class="form-control" id="searchInput">
         <button type="submit" class="btn" id="searchBtn">Search</button>
     `)
 }
@@ -139,12 +142,11 @@ function displayPreviousSearch() {
                 previousSearches.splice(i, 1);
             }
         }
-
         previousSearches.unshift(cities);
     }
 
-    clearSearchbox();
     clearSavedHistory();
+    clearSearchbox();
 
     for(var i = 0; i < previousSearches.length; i++) {
         previousSearchEL.append(`
