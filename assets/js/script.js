@@ -125,21 +125,22 @@ function clearSearchbox() {
 function clearSavedHistory() {
     previousSearchEL.empty();
     previousSearchEL.append(`
-        <button type="button" class="btn clearBtn" value="clear">CLEAR HISTORY</button>
+        <button type="button" class="btn clearBtn" value="clear">Clear</button>
     `)
 }
 
+// This function displays the searches entered thus far
 function displayPreviousSearch() {
     if(successfulSearch) {
-        var cityCaps = citySearched;
+        var cities = citySearched;
 
         for(var i = 0; i < previousSearches.length; i++) {
-            if(cityCaps === previousSearches[i]) {
+            if(cities === previousSearches[i]) {
                 previousSearches.splice(i, 1);
             }
         }
 
-        previousSearches.unshift(cityCaps);
+        previousSearches.unshift(cities);
     }
 
     clearSearchbox();
@@ -154,16 +155,17 @@ function displayPreviousSearch() {
     saveSearches();
 }
 
-
-function handleSearchSubmit(event) {
+// Submit the searched up city for API to find
+function searchSubmit(event) {
     event.preventDefault();
 
-    citySearched = $("#searchInput").val();
+    citySearched = $("#searchInput").val(); //pulled id from function 'clearSearchbox'
 
     searchApiByCity();
 }
 
-function handleButtonClick(event) {
+// Once the search buttion is clicked, display values
+function buttonClick(event) {
     event.preventDefault();
 
     var btnValue = event.target.value;
@@ -179,7 +181,9 @@ function handleButtonClick(event) {
     }
 }
 
+// calling function
 displayPreviousSearch();
 
-searchEL.on("submit", handleSearchSubmit);
-previousSearchEL.on("click", handleButtonClick);
+// event listeners
+searchEL.on("submit", searchSubmit);
+previousSearchEL.on("click", buttonClick);
