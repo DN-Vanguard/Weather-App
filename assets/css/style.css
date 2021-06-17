@@ -1,0 +1,102 @@
+/* Global attributes and variables */
+* {
+    font-family: sans-serif;
+    box-sizing: border-box;
+}
+:root {
+    --lightblue: #3f84fb;
+    --darkblue:#1b0a33;
+    --gray: darkgray;
+    --fontWeight: 600;
+}
+
+/* header */
+header {
+    display: flex;
+    justify-content: center;
+    background: linear-gradient(160deg, var(--lightblue), var(--darkblue));
+    padding: 5px;
+    padding-top: 10px;
+}
+
+/* h tag styling */
+h1,h2,h3,h4 {
+    font-weight: var(--fontWeight);
+}
+h1 { /* title: Weather Dashboard */
+    color: white;
+    font-size: 200%;
+}
+h2 {/* 'search for a city' and see js code under id=currentWeatherBox*/
+    font-size: 180%;
+}
+h3 { /* the words '5-day forecast'*/
+    font-size: 150%;
+    margin-top: 10px;
+}
+h4 { /* the 5 populated dates under 5 day forecast*/
+    font-size: 130%;
+}
+
+/* Classes styling */
+.mainRow {
+    display: flex;
+    margin-left: 10px;
+}
+.searchBox {
+    padding: 5px;
+    width: 25%;
+}
+#searchBtn {
+    background-color: var(--lightblue);
+    color: white;
+    margin: 15px 0;
+}
+#clearBtn {
+    background-color: var(--darkblue);
+    color: white;
+    margin-top: 15px;
+}
+#currentWeatherBox {
+    border: solid black 1px;
+    padding: 5px;
+    padding-left: 10px;
+}
+#weatherDisplay {
+    width: 75%;
+    padding: 10px;
+}
+#previousSearch {
+    border-top: solid black 2px;
+}
+
+#fiveDays {
+    display: flex;
+    justify-content: space-between;
+}
+#fiveDays div {
+    background: linear-gradient(300deg, var(--lightblue), var(--darkblue));
+    color: white;
+    width: calc(20% - 10px);
+    padding: 5px;
+}
+.btn { /* previous searches button*/
+    background-color: var(--gray);
+    width: 100%;
+    margin: 5px 0;
+    font-size: initial;
+}
+
+.uvColor {
+    background: green;
+    color: white;
+    border-radius: 5px;
+    padding: 5px 15px;
+}
+
+
+
+/* ---------- */
+.icon {
+    width: 50px;
+}

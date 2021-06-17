@@ -18,7 +18,7 @@ var previousSearches = JSON.parse(localStorage.getItem("previousSearches")) || [
 function errorDisplay() {
     weatherDisplayEL.empty();
     weatherDisplayEL.append(`
-        <h3>No Results Found. Please Try Again</h3>
+        <h2>No Results Found. Please Try Again</h2>
     `);
 }
 
@@ -36,7 +36,7 @@ function weatherDisplayed(weatherData) {
             <p>UV Index: <span class="uvColor ${(weatherData.current.uvi)}">${weatherData.current.uvi}</span></p>
         </div>
         <h3>5-Day Forecast:</h3>
-        <div id="fiveDayContainer">
+        <div id="fiveDays">
             ${forecastDisplayed(weatherData)}
         </div>
     `);
@@ -125,7 +125,7 @@ function clearSearchbox() {
 function clearSavedHistory() {
     previousSearchEL.empty();
     previousSearchEL.append(`
-        <button type="button" class="btn clearBtn" value="clear">Clear</button>
+        <button type="button" class="btn" id="clearBtn" value="clear">Clear</button>
     `)
 }
 
