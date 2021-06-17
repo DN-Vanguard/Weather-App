@@ -8,14 +8,13 @@ var previousSearchEL = $("#previousSearch");
 var weatherDisplayEL = $("#weatherDisplay");
 
 // tracking variables
-var searchedCity;
-var searchSuccess = false; //equaling false because we are implying that the user is going to enter an incorrect city, and will become true ONLY IF the user typed a legitmate city. The data is pulled from 'APIurl'
-
-var fiveDay = 5;
+var citySearched;
+var successfulSearch = false; //equaling false because we are implying that the user is going to enter an incorrect city, and will become true ONLY IF the user typed a legitmate city. The data is pulled from 'APIurl'
+var fiveDays = 5;
 var offset = 0; //starting off at 0 because that is the current day.
 var previousSearches = JSON.parse(localStorage.getItem("previousSearches")) || [];
 
-
+// if user types an incorrect city, or a city that does not exist within the API, error will display.
 function errorDisplay() {
     weatherDisplayEL.empty();
     weatherDisplayEL.append(`
@@ -23,12 +22,33 @@ function errorDisplay() {
     `);
 }
 
-function displayForecast(forecastData) {
+// The weather is displayed on the screen in its appropriate format of the current day and city that was typed. It also leads into its forecasted display.
+function weatherDisplayed(weatherData) {
+    weatherDisplayEL.empty();
+    weatherDisplayEL.append(`
+        <div id="currentWeatherBox">
+            <h2>${citySearched} (${moment(weatherData.current.dt, "X").format("MM/DD/YYYY")})
+                <img src="https://openweathermap.org/img/wn/${weatherData.current.weather[0].icon}@2x.png" alt="weather icon" class="icon"> 
+            </h2>
+            <p>Temp: ${weatherData.current.temp} <span>&#176;</span> F</p>
+            <p>Wind: ${weatherData.current.wind_speed} MPH</p>
+            <p>Humidity: ${weatherData.current.humidity} %</p>
+            <p>UV Index: <span class="uvColor ${(weatherData.current.uvi)}">${weatherData.current.uvi}</span></p>
+        </div>
+        <h3>5-Day Forecast:</h3>
+        <div id="fiveDayContainer">
+            ${forecastDisplayed(weatherData)}
+        </div>
+    `);
+}
+
+// Here is where the next 5 days of forecasted weather will appear starting with tomorrows forecast.
+function forecastDisplayed(forecastData) {
     var forecast = [];
 
     offset = (moment(forecastData.current.dt, "X").format("D") === moment(forecastData.daily[0].dt, "X").format("D") ? 1 : 0);
 
-    for(var i = 0 + offset; i < fiveDay + offset; i++) {
+    for(var i = 0 + offset; i < fiveDays + offset; i++) {
         forecast.push(`
             <div class="forecastBox ${(forecastData.daily[i].temp.day)}">
                 <h4>${moment(forecastData.daily[i].dt, "X").format("MM/DD/YYYY")}</h4>
@@ -42,69 +62,7 @@ function displayForecast(forecastData) {
     return forecast.join("");
 }
 
-function weatherDisplayed(weatherData) {
-    weatherDisplayEL.empty();
-    weatherDisplayEL.append(`
-        <div id="currentWeatherBox">
-            <h2>${searchedCity} (${moment(weatherData.current.dt, "X").format("MM/DD/YYYY")})
-                <img src="https://openweathermap.org/img/wn/${weatherData.current.weather[0].icon}@2x.png" alt="weather icon" class="icon"> 
-            </h2>
-            <p>Temp: ${weatherData.current.temp} <span>&#176;</span> F</p>
-            <p>Wind: ${weatherData.current.wind_speed} MPH</p>
-            <p>Humidity: ${weatherData.current.humidity} %</p>
-            <p>UV Index: <span class="uvColor ${(weatherData.current.uvi)}">${weatherData.current.uvi}</span></p>
-        </div>
-        <h3>5-Day Forecast:</h3>
-        <div id="fiveDayContainer">
-            ${displayForecast(weatherData)}
-        </div>
-    `);
-}
-
-function saveSearches() {
-    localStorage.setItem("previousSearches", JSON.stringify(previousSearches));
-}
-
-function resetSearchBox() {
-    searchEL.empty();
-    searchEL.append(`
-        <input type="search" placeholder="Ex: Seattle" class="form-control" id="searchInput">
-        <button type="submit" class="btn" id="searchBtn">Search</button>
-    `)
-}
-
-function clearHistoryDisplay() {
-    previousSearchEL.empty();
-    previousSearchEL.append(`
-        <button type="button" class="btn clearBtn" value="clear">CLEAR HISTORY</button>
-    `)
-}
-
-function displayPreviousSearch() {
-    if(searchSuccess) {
-        var cityCaps = searchedCity;
-
-        for(var i = 0; i < previousSearches.length; i++) {
-            if(cityCaps === previousSearches[i]) {
-                previousSearches.splice(i, 1);
-            }
-        }
-
-        previousSearches.unshift(cityCaps);
-    }
-
-    resetSearchBox();
-    clearHistoryDisplay();
-
-    for(var i = 0; i < previousSearches.length; i++) {
-        previousSearchEL.append(`
-            <button type="button" class="btn" value="${previousSearches[i]}">${previousSearches[i]}</button>
-        `);
-    }
-
-    saveSearches();
-}
-
+// Here we are calling the api's longitude and latitude for the wind, UV, etc.
 function searchApiByCoordinates(lat, lon) {
     var locQueryUrl = `${APIurl}onecall?${lat}&${lon}&exclude=minutely,hourly&units=imperial&appid=${APIkey}`;
 
@@ -116,9 +74,9 @@ function searchApiByCoordinates(lat, lon) {
             }
             return response.json();
         })
-        .then(function (locRes) {
-            weatherDisplayed(locRes);
-            searchSuccess = true;
+        .then(function (local) {
+            weatherDisplayed(local);
+            successfulSearch = true;
             displayPreviousSearch();
         })
         .catch(function (error) {
@@ -126,8 +84,9 @@ function searchApiByCoordinates(lat, lon) {
         });
 }
 
+// similar to the function above, but this is purely for the city
 function searchApiByCity() {
-    var locQueryUrl = `${APIurl}weather?q=${searchedCity}&appid=${APIkey}`;
+    var locQueryUrl = `${APIurl}weather?q=${citySearched}&appid=${APIkey}`;
 
     fetch(locQueryUrl)
         .then(function (response) {
@@ -137,10 +96,10 @@ function searchApiByCity() {
             }
             return response.json();
         })
-        .then(function (locRes) {
-            searchedCity = locRes.name;
-            var cityLat = `lat=${locRes.coord.lat}`;
-            var cityLon = `lon=${locRes.coord.lon}`;
+        .then(function (local) {
+            citySearched = local.name;
+            var cityLat = `lat=${local.coord.lat}`;
+            var cityLon = `lon=${local.coord.lon}`;
             searchApiByCoordinates(cityLat, cityLon);
         })
         .catch(function (error) {
@@ -148,10 +107,58 @@ function searchApiByCity() {
         });
 }
 
+// Save the correct inputed searches locally
+function saveSearches() {
+    localStorage.setItem("previousSearches", JSON.stringify(previousSearches));
+}
+
+// This will clear the searchbox everytime the user clicks enter or 'search'
+function clearSearchbox() {
+    searchEL.empty();
+    searchEL.append(`
+        <input type="search" placeholder="Ex: Bellevue" class="form-control" id="searchInput">
+        <button type="submit" class="btn" id="searchBtn">Search</button>
+    `)
+}
+
+// Will clear the saved cities
+function clearSavedHistory() {
+    previousSearchEL.empty();
+    previousSearchEL.append(`
+        <button type="button" class="btn clearBtn" value="clear">CLEAR HISTORY</button>
+    `)
+}
+
+function displayPreviousSearch() {
+    if(successfulSearch) {
+        var cityCaps = citySearched;
+
+        for(var i = 0; i < previousSearches.length; i++) {
+            if(cityCaps === previousSearches[i]) {
+                previousSearches.splice(i, 1);
+            }
+        }
+
+        previousSearches.unshift(cityCaps);
+    }
+
+    clearSearchbox();
+    clearSavedHistory();
+
+    for(var i = 0; i < previousSearches.length; i++) {
+        previousSearchEL.append(`
+            <button type="button" class="btn" value="${previousSearches[i]}">${previousSearches[i]}</button>
+        `);
+    }
+
+    saveSearches();
+}
+
+
 function handleSearchSubmit(event) {
     event.preventDefault();
 
-    searchedCity = $("#searchInput").val();
+    citySearched = $("#searchInput").val();
 
     searchApiByCity();
 }
@@ -162,12 +169,12 @@ function handleButtonClick(event) {
     var btnValue = event.target.value;
 
     if(btnValue === "clear") {
-        clearHistoryDisplay();
+        clearSavedHistory();
         weatherDisplayEL.empty();
         previousSearches = [];
         saveSearches();
     } else {
-        searchedCity = btnValue;
+        citySearched = btnValue;
         searchApiByCity();
     }
 }
